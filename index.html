@@ -1,29 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Lead Qualification</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Qualification to MASR.AI</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
-        .form-container { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #333; color: white; border: none; cursor: pointer; }
+        :root {
+            --text-gray: #666;
+            --border-color: #ddd;
+            --bg-color: #fff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #444;
+            font-weight: 400;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: var(--text-gray);
+            font-size: 16px;
+            line-height: 1.4;
+            margin-bottom: 30px;
+        }
+
+        form {
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box; /* Important for padding */
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #000;
+        }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h2>Lead Qualification</h2>
-        <form action="YOUR_FORM_SERVICE_URL_HERE" method="POST">
-            <label>Name</label>
-            <input type="text" name="name" placeholder="Your Name">
-            
-            <label>Monthly Budget</label>
-            <select name="budget">
-                <option value="1k">1k+</option>
-                <option value="5k">5k+</option>
-            </select>
 
-            <button type="submit">Submit</button>
-        </form>
-    </div>
+<div class="container">
+    <h1>Lead Qualification to MASR.AI</h1>
+    <p class="subtitle">it is a lead qualification to reserve an appointment for making ai automation for your business</p>
+
+    <form action="https://formspree.io/f/your_id_here" method="POST">
+        
+        <label>Name</label>
+        <input type="text" name="name" placeholder="Hossam" required>
+
+        <label>Email</label>
+        <input type="email" name="email" placeholder="example@gmail.com" required>
+
+        <label>Your budget per month</label>
+        <select name="budget">
+            <option value="1k">1k+</option>
+            <option value="5k+">5k+</option>
+            <option value="10k+">10k+</option>
+        </select>
+
+        <label>What is the type of solution do u want to be added to your business</label>
+        <select name="solution">
+            <option value="chatbot">chatbot</option>
+            <option value="workflow">workflow automation</option>
+            <option value="custom">custom AI tool</option>
+        </select>
+
+        <label>Special message</label>
+        <textarea name="message" placeholder="Your message here..."></textarea>
+
+        <label>Phone number</label>
+        <input type="tel" name="phone" placeholder="010XXXXXXXX">
+
+        <button type="submit">Submit Request</button>
+    </form>
+</div>
+
 </body>
 </html>
