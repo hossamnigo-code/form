@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lead Qualification</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .form-container { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #333; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Lead Qualification</h2>
+        <form action="YOUR_FORM_SERVICE_URL_HERE" method="POST">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="Your Name">
+            
+            <label>Monthly Budget</label>
+            <select name="budget">
+                <option value="1k">1k+</option>
+                <option value="5k">5k+</option>
+            </select>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
