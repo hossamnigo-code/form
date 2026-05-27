@@ -1,43 +1,156 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IMG</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-```
-html, body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #000;
-}
-
-.photo {
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  object-position: center top;
-  display: block;
-  animation: fadeIn 1.4s ease forwards;
-  opacity: 0;
-}
-
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
-```
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curated Finds | My Shop</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Smooth transition for the admin panel */
+        #adminPanel { transition: transform 0.3s ease-in-out; }
+    </style>
 </head>
-<body>
-  <img class="photo" src="IMG_7775.jpeg" alt="Photo">
+<body class="bg-gray-50 text-gray-900 font-sans">
+
+    <header class="bg-white border-b border-gray-200 py-6 text-center sticky top-0 z-40 shadow-xs">
+        <h1 class="text-2xl font-bold tracking-wide uppercase text-gray-800">Curated Finds</h1>
+        <p class="text-xs text-gray-500 mt-1">Handpicked gear & essentials from Amazon</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            </div>
+    </main>
+
+    <div id="adminPanel" class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 p-6 transform translate-x-full border-l border-gray-200 overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-red-600">Admin Control</h2>
+            <button onclick="toggleAdmin()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
+        </div>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase">Product Name</label>
+                <input type="text" id="prodTitle" class="w-full mt-1 p-2 border rounded-md text-sm focus:outline-blue-500" placeholder="e.g., Minimalist Desk Mat">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase">Image URL</label>
+                <input type="text" id="prodImage" class="w-full mt-1 p-2 border rounded-md text-sm focus:outline-blue-500" placeholder="https://example.com/image.jpg">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase">Amazon Affiliate URL</label>
+                <input type="text" id="prodLink" class="w-full mt-1 p-2 border rounded-md text-sm focus:outline-blue-500" placeholder="https://amzn.to/...">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase">Price Tag (Optional)</label>
+                <input type="text" id="prodPrice" class="w-full mt-1 p-2 border rounded-md text-sm focus:outline-blue-500" placeholder="e.g., $25">
+            </div>
+            <button onclick="addProduct()" class="w-full bg-black text-white py-2 rounded-md font-medium text-sm hover:bg-gray-800 transition">Add Product</button>
+        </div>
+
+        <hr class="my-6 border-gray-200">
+
+        <h3 class="text-sm font-bold text-gray-700 mb-3">Manage Products</h3>
+        <div id="adminProductList" class="space-y-2"></div>
+    </div>
+
+    <footer class="text-center py-8 text-xs text-gray-400 max-w-2xl mx-auto px-4">
+        As an Amazon Associate, I earn from qualifying purchases.
+    </footer>
+
+    <script>
+        // Sample seed data so the site isn't blank on first load
+        const defaultProducts = [
+            { id: 1, title: "Minimalist Mechanical Keyboard", image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500", link: "https://amazon.com", price: "$89" },
+            { id: 2, title: "Matte Black Coffee Mug", image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500", link: "https://amazon.com", price: "$18" }
+        ];
+
+        // Load items from localStorage or fallback to defaults
+        let products = JSON.parse(localStorage.getItem('shop_products')) || defaultProducts;
+
+        // Render everything to the screen
+        function renderShop() {
+            const grid = document.getElementById('productGrid');
+            const adminList = document.getElementById('adminProductList');
+            
+            // Render Public Grid
+            grid.innerHTML = products.map(p => `
+                <div class="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-xs hover:shadow-md transition duration-200 flex flex-col">
+                    <div class="aspect-square bg-gray-50 overflow-hidden">
+                        <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-800 line-clamp-2">${p.title}</h3>
+                            <p class="text-xs font-bold text-gray-500 mt-1">${p.price || ''}</p>
+                        </div>
+                        <a href="${p.link}" target="_blank" rel="noopener noreferrer" class="mt-4 block text-center bg-gray-900 text-white text-xs font-medium py-2 rounded-md hover:bg-gray-800 transition">
+                            View on Amazon
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+
+            // Render Admin Controls List
+            adminList.innerHTML = products.map(p => `
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md text-xs">
+                    <span class="truncate font-medium text-gray-700 w-48">${p.title}</span>
+                    <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-red-700 font-bold">Delete</button>
+                </div>
+            `).join('');
+
+            // Save state
+            localStorage.setItem('shop_products', JSON.stringify(products));
+        }
+
+        // Add Product Function
+        function addProduct() {
+            const title = document.getElementById('prodTitle').value;
+            const image = document.getElementById('prodImage').value;
+            const link = document.getElementById('prodLink').value;
+            const price = document.getElementById('prodPrice').value;
+
+            if(!title || !image || !link) {
+                alert('Please fill out Name, Image, and Amazon Link fields.');
+                return;
+            }
+
+            const newProduct = { id: Date.now(), title, image, link, price };
+            products.unshift(newProduct); // Add to the front
+            renderShop();
+
+            // Clear inputs
+            document.getElementById('prodTitle').value = '';
+            document.getElementById('prodImage').value = '';
+            document.getElementById('prodLink').value = '';
+            document.getElementById('prodPrice').value = '';
+        }
+
+        // Delete Product Function
+        function deleteProduct(id) {
+            products = products.filter(p => p.id !== id);
+            renderShop();
+        }
+
+        // Secret Secret Key Listener (admin1234)
+        let keyBuffer = "";
+        window.addEventListener('keydown', (e) => {
+            keyBuffer += e.key;
+            if (keyBuffer.length > 20) keyBuffer = keyBuffer.substring(keyBuffer.length - 20);
+            
+            if (keyBuffer.includes("admin1234")) {
+                toggleAdmin();
+                keyBuffer = ""; // reset buffer
+            }
+        });
+
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            panel.classList.toggle('translate-x-full');
+        }
+
+        // Initial Load
+        renderShop();
+    </script>
 </body>
 </html>
