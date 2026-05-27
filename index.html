@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curated Finds | Global Shop</title>
+    <title>Curated Finds | Secure Shop</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -12,9 +12,12 @@
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
 
-    <header class="bg-white border-b border-gray-200 py-6 text-center sticky top-0 z-40 shadow-xs">
-        <h1 class="text-2xl font-bold tracking-wide uppercase text-gray-800">Curated Finds</h1>
-        <p class="text-xs text-gray-500 mt-1">Handpicked gear & essentials from Amazon</p>
+    <header class="bg-white border-b border-gray-200 py-6 text-center sticky top-0 z-40 shadow-xs flex justify-between items-center px-6">
+        <div class="w-20"></div> <div>
+            <h1 class="text-2xl font-bold tracking-wide uppercase text-gray-800">Curated Finds</h1>
+            <p class="text-xs text-gray-500 mt-1">Handpicked gear & essentials from Amazon</p>
+        </div>
+        <button onclick="toggleAdminPanel()" class="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1 rounded-md">Admin</button>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
@@ -25,34 +28,51 @@
 
     <div id="adminPanel" class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 p-6 transform translate-x-full border-l border-gray-200 overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-red-600">Admin Control</h2>
-            <button onclick="toggleAdmin()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
+            <h2 class="text-xl font-bold text-gray-800">Shop Control</h2>
+            <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
         </div>
         
-        <div class="space-y-4">
+        <div id="loginForm" class="space-y-4">
+            <p class="text-xs text-gray-500">Log in with your Supabase credentials to manage inventory.</p>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase">Email</label>
+                <input type="email" id="adminEmail" class="w-full mt-1 p-2 border rounded-md text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase">Password</label>
+                <input type="password" id="adminPassword" class="w-full mt-1 p-2 border rounded-md text-sm">
+            </div>
+            <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-2 rounded-md font-medium text-sm hover:bg-blue-700 transition">Sign In</button>
+        </div>
+
+        <div id="adminControls" class="space-y-4 hidden">
+            <div class="flex justify-between items-center bg-green-50 p-2 rounded-md mb-4">
+                <span class="text-xs text-green-700 font-medium">✓ Logged In Securely</span>
+                <button onclick="handleLogout()" class="text-xs text-red-500 underline">Logout</button>
+            </div>
+
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase">Product Name</label>
-                <input type="text" id="prodTitle" class="w-full mt-1 p-2 border rounded-md text-sm focus:outline-blue-500" placeholder="e.g., Minimalist Desk Mat">
+                <input type="text" id="prodTitle" class="w-full mt-1 p-2 border rounded-md text-sm" placeholder="e.g., Minimalist Desk Mat">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase">Image URL</label>
-                <input type="text" id="prodImage" class="w-full mt-1 p-2 border rounded-md text-sm focus:outline-blue-500" placeholder="https://example.com/image.jpg">
+                <input type="text" id="prodImage" class="w-full mt-1 p-2 border rounded-md text-sm" placeholder="https://example.com/image.jpg">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase">Amazon Affiliate URL</label>
-                <input type="text" id="prodLink" class="w-full mt-1 p-2 border rounded-md text-sm focus:outline-blue-500" placeholder="https://amzn.to/...">
+                <input type="text" id="prodLink" class="w-full mt-1 p-2 border rounded-md text-sm" placeholder="https://amzn.to/...">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase">Price Tag</label>
-                <input type="text" id="prodPrice" class="w-full mt-1 p-2 border rounded-md text-sm focus:outline-blue-500" placeholder="e.g., $25">
+                <input type="text" id="prodPrice" class="w-full mt-1 p-2 border rounded-md text-sm" placeholder="e.g., $25">
             </div>
             <button onclick="addProduct()" class="w-full bg-black text-white py-2 rounded-md font-medium text-sm hover:bg-gray-800 transition">Add Product Global</button>
+            
+            <hr class="my-6 border-gray-200">
+            <h3 class="text-sm font-bold text-gray-700 mb-3">Manage Live Products</h3>
+            <div id="adminProductList" class="space-y-2"></div>
         </div>
-
-        <hr class="my-6 border-gray-200">
-
-        <h3 class="text-sm font-bold text-gray-700 mb-3">Manage Live Products</h3>
-        <div id="adminProductList" class="space-y-2"></div>
     </div>
 
     <footer class="text-center py-8 text-xs text-gray-400 max-w-2xl mx-auto px-4">
@@ -60,134 +80,104 @@
     </footer>
 
     <script>
-        // CONFIGURATION: Linked directly to your bddvpmtzuedxclseyxqs project
         const SUPABASE_URL = "https://bddvpmtzuedxclseyxqs.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZHZwbXR6dWVkeGNsc2V5eHFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDM4NDcsImV4cCI6MjA5NTQ3OTg0N30.JXpWWk0SurmsJlHtXJY-QNYtLDYyTuE0LvLeSDXn9XQ";
 
-        // Initialize Supabase Client
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
         let products = [];
 
-        // Fetch products globally from the DB
-        async function fetchProducts() {
-            const { data, error } = await _supabase
-                .from('products')
-                .select('*')
-                .order('created_at', { ascending: false });
+        // Check auth state on startup to keep user logged in if they refresh
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            updateUIForAuth(session);
+            fetchProducts();
+        });
 
-            if (error) {
-                console.error('Error fetching data:', error);
-                return;
-            }
-            
-            products = data;
-            renderShop();
+        async function fetchProducts() {
+            const { data, error } = await _supabase.from('products').select('*').order('created_at', { ascending: false });
+            if (!error) { products = data; renderShop(); }
         }
 
-        // Render data out onto the DOM elements
         function renderShop() {
             const grid = document.getElementById('productGrid');
             const adminList = document.getElementById('adminProductList');
             
             if (!products || products.length === 0) {
-                grid.innerHTML = `<p class="text-center col-span-full text-gray-400 py-12 text-sm">Shop is currently empty. Open admin panel to add items.</p>`;
-                adminList.innerHTML = '';
+                grid.innerHTML = `<p class="text-center col-span-full text-gray-400 py-12 text-sm">Shop is empty.</p>`;
                 return;
             }
 
-            // Render Client UI grid
             grid.innerHTML = products.map(p => `
-                <div class="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-xs hover:shadow-md transition duration-200 flex flex-col">
-                    <div class="aspect-square bg-gray-50 overflow-hidden">
-                        <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
-                    </div>
+                <div class="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-xs flex flex-col">
+                    <img src="${p.image}" class="w-full aspect-square object-cover">
                     <div class="p-4 flex-1 flex flex-col justify-between">
                         <div>
                             <h3 class="text-sm font-semibold text-gray-800 line-clamp-2">${p.title}</h3>
                             <p class="text-xs font-bold text-gray-500 mt-1">${p.price || ''}</p>
                         </div>
-                        <a href="${p.link}" target="_blank" rel="noopener noreferrer" class="mt-4 block text-center bg-gray-900 text-white text-xs font-medium py-2 rounded-md hover:bg-gray-800 transition">
-                            View on Amazon
-                        </a>
+                        <a href="${p.link}" target="_blank" class="mt-4 block text-center bg-gray-900 text-white text-xs py-2 rounded-md">View on Amazon</a>
                     </div>
                 </div>
             `).join('');
 
-            // Render Dashboard panel list items
             adminList.innerHTML = products.map(p => `
                 <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md text-xs">
-                    <span class="truncate font-medium text-gray-700 w-48">${p.title}</span>
-                    <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-red-700 font-bold">Delete</button>
+                    <span class="truncate w-48">${p.title}</span>
+                    <button onclick="deleteProduct(${p.id})" class="text-red-500 font-bold">Delete</button>
                 </div>
             `).join('');
         }
 
-        // Push new items straight to database
+        // Auth Logic Handlers
+        async function handleLogin() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert('Login Failed: ' + error.message);
+            } else {
+                updateUIForAuth(data.session);
+            }
+        }
+
+        async function handleLogout() {
+            await _supabase.auth.signOut();
+            updateUIForAuth(null);
+        }
+
+        function updateUIForAuth(session) {
+            const loginForm = document.getElementById('loginForm');
+            const adminControls = document.getElementById('adminControls');
+            if (session) {
+                loginForm.classList.add('hidden');
+                adminControls.classList.remove('hidden');
+            } else {
+                loginForm.classList.remove('hidden');
+                adminControls.classList.add('hidden');
+            }
+        }
+
         async function addProduct() {
             const title = document.getElementById('prodTitle').value;
             const image = document.getElementById('prodImage').value;
             const link = document.getElementById('prodLink').value;
             const price = document.getElementById('prodPrice').value;
 
-            if(!title || !image || !link) {
-                alert('Fill out Name, Image, and Amazon Link.');
-                return;
-            }
-
-            const { error } = await _supabase
-                .from('products')
-                .insert([{ title, image, link, price }]);
-
-            if (error) {
-                alert('Error adding product: ' + error.message);
-            } else {
-                // Clear input items
-                document.getElementById('prodTitle').value = '';
-                document.getElementById('prodImage').value = '';
-                document.getElementById('prodLink').value = '';
-                document.getElementById('prodPrice').value = '';
-                
-                // Refresh list instantly
-                await fetchProducts();
-            }
+            const { error } = await _supabase.from('products').insert([{ title, image, link, price }]);
+            if (error) alert(error.message);
+            else { fetchProducts(); }
         }
 
-        // Remove item from database
         async function deleteProduct(id) {
-            if(!confirm("Are you sure you want to delete this live product?")) return;
-            
-            const { error } = await _supabase
-                .from('products')
-                .delete()
-                .eq('id', id);
-
-            if (error) {
-                alert('Error deleting product: ' + error.message);
-            } else {
-                await fetchProducts();
-            }
+            const { error } = await _supabase.from('products').delete().eq('id', id);
+            if (error) alert(error.message);
+            else fetchProducts();
         }
 
-        // Dashboard key sequence trigger string (admin1234)
-        let keyBuffer = "";
-        window.addEventListener('keydown', (e) => {
-            keyBuffer += e.key;
-            if (keyBuffer.length > 20) keyBuffer = keyBuffer.substring(keyBuffer.length - 20);
-            
-            if (keyBuffer.includes("admin1234")) {
-                toggleAdmin();
-                keyBuffer = "";
-            }
-        });
-
-        function toggleAdmin() {
-            const panel = document.getElementById('adminPanel');
-            panel.classList.toggle('translate-x-full');
+        function toggleAdminPanel() {
+            document.getElementById('adminPanel').classList.toggle('translate-x-full');
         }
-
-        // Fire off data query immediately on window startup
-        fetchProducts();
     </script>
 </body>
 </html>
