@@ -471,6 +471,135 @@
         #loginForm, #adminControls { display: block; }
         .hidden { display: none !important; }
 
+        /* ── ADMIN CARD OVERLAY ── */
+        .card-admin-bar {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            padding: 8px;
+            gap: 6px;
+            background: linear-gradient(to bottom, rgba(26,23,20,0.72) 0%, transparent 100%);
+            z-index: 5;
+        }
+        body.admin-active .card-admin-bar { display: flex; }
+        body.admin-active .product-card:hover .card-admin-bar { display: flex; }
+
+        .card-edit-btn {
+            background: var(--gold);
+            color: var(--ink);
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 8.5px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.2s;
+            flex: 1;
+        }
+        .card-edit-btn:hover { background: #B8924A; }
+
+        .card-delete-quick-btn {
+            background: rgba(198,40,40,0.85);
+            color: #fff;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 8.5px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .card-delete-quick-btn:hover { background: #b71c1c; }
+
+        /* ── EDIT MODAL ── */
+        #editModal {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        #editModal.open { opacity: 1; pointer-events: all; }
+
+        #editModalBackdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(26,23,20,0.55);
+        }
+
+        .edit-modal-box {
+            position: relative;
+            z-index: 1;
+            background: var(--panel-bg);
+            border: 1px solid var(--divider);
+            width: 100%;
+            max-width: 420px;
+            padding: 2rem;
+            transform: translateY(16px);
+            transition: transform 0.25s;
+        }
+        #editModal.open .edit-modal-box { transform: translateY(0); }
+
+        .edit-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--divider);
+        }
+        .edit-modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 400;
+            font-size: 1.3rem;
+            letter-spacing: 0.06em;
+        }
+
+        .edit-btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 1.25rem;
+        }
+        .btn-cancel {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            color: var(--ink-muted);
+            border: 1px solid var(--divider);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .btn-cancel:hover { border-color: var(--ink-muted); color: var(--ink); }
+        .btn-save {
+            flex: 2;
+            padding: 10px;
+            background: var(--ink);
+            color: var(--cream);
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-save:hover { background: #2E2A25; }
+
         /* staggered card animations */
         .product-card:nth-child(1) { animation-delay: 0.05s; }
         .product-card:nth-child(2) { animation-delay: 0.1s; }
@@ -572,6 +701,38 @@
         </div>
     </div>
 
+    <!-- Edit Modal -->
+    <div id="editModal">
+        <div id="editModalBackdrop" onclick="closeEditModal()"></div>
+        <div class="edit-modal-box">
+            <div class="edit-modal-header">
+                <span class="edit-modal-title">Edit Product</span>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" id="editTitle" class="form-input" placeholder="e.g., Minimalist Desk Mat">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Image URL</label>
+                <input type="text" id="editImage" class="form-input" placeholder="https://example.com/image.jpg">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Amazon Affiliate URL</label>
+                <input type="text" id="editLink" class="form-input" placeholder="https://amzn.to/...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Price Tag</label>
+                <input type="text" id="editPrice" class="form-input" placeholder="e.g., $25">
+            </div>
+            <div class="edit-btn-row">
+                <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = "https://bddvpmtzuedxclseyxqs.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZHZwbXR6dWVkeGNsc2V5eHFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDM4NDcsImV4cCI6MjA5NTQ3OTg0N30.JXpWWk0SurmsJlHtXJY-QNYtLDYyTuE0LvLeSDXn9XQ";
@@ -610,6 +771,10 @@
                     <div class="card-img-wrap">
                         ${imgTag}
                         ${p.price ? `<span class="card-tag">${escapeHtml(p.price)}</span>` : ''}
+                        <div class="card-admin-bar">
+                            <button class="card-edit-btn" onclick="openEditModal(${p.id})">Edit</button>
+                            <button class="card-delete-quick-btn" onclick="deleteProduct(${p.id})">Delete</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div>
@@ -628,6 +793,7 @@
                     <div class="admin-product-item">
                         ${p.image ? `<img src="${escapeHtml(p.image)}" class="admin-prod-img" onerror="this.style.display='none'">` : `<div class="admin-prod-img"></div>`}
                         <span class="admin-prod-name">${escapeHtml(p.title)}</span>
+                        <button class="delete-btn" style="color:var(--gold);margin-right:4px" onclick="openEditModal(${p.id})">Edit</button>
                         <button class="delete-btn" onclick="deleteProduct(${p.id})">Del</button>
                     </div>
                 `).join('');
@@ -659,6 +825,34 @@
         function updateUIForAuth(session) {
             document.getElementById('loginForm').classList.toggle('hidden', !!session);
             document.getElementById('adminControls').classList.toggle('hidden', !session);
+            document.body.classList.toggle('admin-active', !!session);
+        }
+
+        function openEditModal(id) {
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+            document.getElementById('editId').value = p.id;
+            document.getElementById('editTitle').value = p.title || '';
+            document.getElementById('editImage').value = p.image || '';
+            document.getElementById('editLink').value = p.link || '';
+            document.getElementById('editPrice').value = p.price || '';
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('open');
+        }
+
+        async function saveEdit() {
+            const id    = document.getElementById('editId').value;
+            const title = document.getElementById('editTitle').value.trim();
+            const image = document.getElementById('editImage').value.trim();
+            const link  = document.getElementById('editLink').value.trim();
+            const price = document.getElementById('editPrice').value.trim();
+            if (!title || !link) { alert('Name and link are required.'); return; }
+            const { error } = await _supabase.from('products').update({ title, image, link, price }).eq('id', id);
+            if (error) { alert(error.message); }
+            else { closeEditModal(); fetchProducts(); }
         }
 
         async function addProduct() {
