@@ -3,81 +3,574 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curated Finds | Secure Shop</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Curated Finds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        #adminPanel { transition: transform 0.3s ease-in-out; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --cream: #F7F4EF;
+            --warm-white: #FDFCFA;
+            --ink: #1A1714;
+            --ink-light: #4A4540;
+            --ink-muted: #8A847C;
+            --gold: #C9A96E;
+            --gold-light: #E8D5B0;
+            --divider: #E2DDD6;
+            --card-bg: #FFFFFF;
+            --panel-bg: #FDFCFA;
+            --accent-hover: #F0EBE3;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--cream);
+            color: var(--ink);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: var(--warm-white);
+            border-bottom: 1px solid var(--divider);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            padding: 0 2.5rem;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left { width: 120px; }
+
+        .header-center { text-align: center; }
+
+        .site-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: 1.75rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--ink);
+            line-height: 1;
+        }
+
+        .site-subtitle {
+            font-size: 9.5px;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            margin-top: 5px;
+            font-weight: 400;
+        }
+
+        .header-right { width: 120px; display: flex; justify-content: flex-end; }
+
+        .admin-btn {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 500;
+            color: var(--ink-muted);
+            background: transparent;
+            border: 1px solid var(--divider);
+            padding: 7px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .admin-btn:hover { border-color: var(--ink-muted); color: var(--ink); }
+
+        /* ── HERO STRIP ── */
+        .hero-strip {
+            background: var(--ink);
+            padding: 3.5rem 2.5rem;
+            text-align: center;
+        }
+        .hero-strip h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(2rem, 5vw, 3.25rem);
+            color: var(--cream);
+            letter-spacing: 0.06em;
+            margin-bottom: 0.75rem;
+        }
+        .hero-strip h2 em { font-style: italic; color: var(--gold-light); }
+        .hero-strip p {
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            font-weight: 400;
+        }
+        .gold-rule {
+            width: 40px;
+            height: 1px;
+            background: var(--gold);
+            margin: 1.25rem auto;
+        }
+
+        /* ── MAIN GRID ── */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+        }
+
+        #productGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 5rem 0;
+            color: var(--ink-muted);
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        /* ── PRODUCT CARD ── */
+        .product-card {
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--divider);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeUp 0.5s ease both;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(26, 23, 20, 0.1);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-img-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 100%;
+            overflow: hidden;
+            background: var(--cream);
+        }
+
+        .card-img-wrap img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.5s ease;
+        }
+        .product-card:hover .card-img-wrap img {
+            transform: scale(1.04);
+        }
+
+        .card-img-wrap .img-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--cream);
+            color: var(--ink-muted);
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            gap: 10px;
+        }
+        .card-img-wrap .img-placeholder svg {
+            opacity: 0.3;
+        }
+
+        .card-tag {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: var(--ink);
+            color: var(--cream);
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 4px 9px;
+            font-weight: 500;
+        }
+
+        .card-body {
+            padding: 1.25rem 1.25rem 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 400;
+            font-size: 1.15rem;
+            line-height: 1.35;
+            color: var(--ink);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-price {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: var(--ink-light);
+            margin-top: 4px;
+        }
+
+        .card-cta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 1.25rem;
+            background: var(--ink);
+            color: var(--cream);
+            text-decoration: none;
+            font-size: 9.5px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .card-cta:hover { background: #2E2A25; }
+        .card-cta svg { opacity: 0.6; }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 2.5rem;
+            border-top: 1px solid var(--divider);
+            background: var(--warm-white);
+        }
+        footer p {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+        }
+
+        /* ── ADMIN PANEL ── */
+        #adminOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 23, 20, 0.45);
+            z-index: 49;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        #adminOverlay.visible { opacity: 1; pointer-events: all; }
+
+        #adminPanel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 340px;
+            background: var(--panel-bg);
+            border-left: 1px solid var(--divider);
+            z-index: 50;
+            padding: 2rem 1.75rem;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+        #adminPanel.open { transform: translateX(0); }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--divider);
+        }
+        .panel-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 400;
+            font-size: 1.4rem;
+            letter-spacing: 0.06em;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--ink-muted);
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: var(--ink); }
+
+        .form-group { margin-bottom: 1.1rem; }
+        .form-label {
+            display: block;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            margin-bottom: 6px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--divider);
+            background: var(--warm-white);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12.5px;
+            font-weight: 300;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus { border-color: var(--ink-light); }
+        .form-input::placeholder { color: var(--ink-muted); }
+
+        .btn-primary {
+            width: 100%;
+            padding: 11px;
+            background: var(--ink);
+            color: var(--cream);
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 9.5px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #2E2A25; }
+
+        .btn-gold {
+            width: 100%;
+            padding: 11px;
+            background: var(--gold);
+            color: var(--ink);
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 9.5px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+        .btn-gold:hover { background: #B8924A; }
+
+        .auth-note {
+            font-size: 11px;
+            color: var(--ink-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .logged-in-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #EBF5EC;
+            padding: 8px 12px;
+            margin-bottom: 1.5rem;
+        }
+        .badge-text { font-size: 11px; color: #2E7D32; font-weight: 500; }
+        .logout-btn {
+            background: none;
+            border: none;
+            font-size: 10px;
+            color: #C62828;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .panel-divider {
+            border: none;
+            border-top: 1px solid var(--divider);
+            margin: 1.75rem 0;
+        }
+
+        .manage-title {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            margin-bottom: 1rem;
+        }
+
+        .admin-product-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--divider);
+        }
+        .admin-product-item:last-child { border-bottom: none; }
+        .admin-prod-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            background: var(--cream);
+            flex-shrink: 0;
+            border: 1px solid var(--divider);
+        }
+        .admin-prod-name {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: #999;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+        .delete-btn:hover { color: #C62828; }
+
+        #loginForm, #adminControls { display: block; }
+        .hidden { display: none !important; }
+
+        /* staggered card animations */
+        .product-card:nth-child(1) { animation-delay: 0.05s; }
+        .product-card:nth-child(2) { animation-delay: 0.1s; }
+        .product-card:nth-child(3) { animation-delay: 0.15s; }
+        .product-card:nth-child(4) { animation-delay: 0.2s; }
+        .product-card:nth-child(5) { animation-delay: 0.25s; }
+        .product-card:nth-child(6) { animation-delay: 0.3s; }
+        .product-card:nth-child(7) { animation-delay: 0.35s; }
+        .product-card:nth-child(8) { animation-delay: 0.4s; }
+
+        @media (max-width: 600px) {
+            header { padding: 0 1.25rem; }
+            main { padding: 2rem 1rem 4rem; }
+            .hero-strip { padding: 2.5rem 1.25rem; }
+            #productGrid { grid-template-columns: repeat(2, 1fr); gap: 0.875rem; }
+            #adminPanel { width: 100%; }
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans">
+<body>
 
-    <header class="bg-white border-b border-gray-200 py-6 text-center sticky top-0 z-40 shadow-xs flex justify-between items-center px-6">
-        <div class="w-20"></div> <div>
-            <h1 class="text-2xl font-bold tracking-wide uppercase text-gray-800">Curated Finds</h1>
-            <p class="text-xs text-gray-500 mt-1">Handpicked gear & essentials from Amazon</p>
+    <div id="adminOverlay" onclick="toggleAdminPanel()"></div>
+
+    <header>
+        <div class="header-left"></div>
+        <div class="header-center">
+            <div class="site-title">Curated Finds</div>
+            <div class="site-subtitle">Handpicked essentials</div>
         </div>
-        <button onclick="toggleAdminPanel()" class="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 px-3 py-1 rounded-md">Admin</button>
+        <div class="header-right">
+            <button class="admin-btn" onclick="toggleAdminPanel()">Admin</button>
+        </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 py-8">
-        <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <p id="loading" class="text-center col-span-full text-gray-400 py-12 text-sm">Loading curated collection...</p>
+    <div class="hero-strip">
+        <h2>Things Worth <em>Owning</em></h2>
+        <div class="gold-rule"></div>
+        <p>A carefully curated selection of gear &amp; essentials</p>
+    </div>
+
+    <main>
+        <div id="productGrid">
+            <div class="empty-state">Loading collection&hellip;</div>
         </div>
     </main>
 
-    <div id="adminPanel" class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 p-6 transform translate-x-full border-l border-gray-200 overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-gray-800">Shop Control</h2>
-            <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
-        </div>
-        
-        <div id="loginForm" class="space-y-4">
-            <p class="text-xs text-gray-500">Log in with your Supabase credentials to manage inventory.</p>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase">Email</label>
-                <input type="email" id="adminEmail" class="w-full mt-1 p-2 border rounded-md text-sm">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase">Password</label>
-                <input type="password" id="adminPassword" class="w-full mt-1 p-2 border rounded-md text-sm">
-            </div>
-            <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-2 rounded-md font-medium text-sm hover:bg-blue-700 transition">Sign In</button>
+    <footer>
+        <p>As an Amazon Associate, I earn from qualifying purchases.</p>
+    </footer>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel">
+        <div class="panel-header">
+            <span class="panel-title">Shop Control</span>
+            <button class="close-btn" onclick="toggleAdminPanel()">&times;</button>
         </div>
 
-        <div id="adminControls" class="space-y-4 hidden">
-            <div class="flex justify-between items-center bg-green-50 p-2 rounded-md mb-4">
-                <span class="text-xs text-green-700 font-medium">✓ Logged In Securely</span>
-                <button onclick="handleLogout()" class="text-xs text-red-500 underline">Logout</button>
+        <div id="loginForm">
+            <p class="auth-note">Sign in with your credentials to manage the inventory.</p>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="adminEmail" class="form-input" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="adminPassword" class="form-input" placeholder="••••••••">
+            </div>
+            <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+        </div>
+
+        <div id="adminControls" class="hidden">
+            <div class="logged-in-badge">
+                <span class="badge-text">✓ Logged in securely</span>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase">Product Name</label>
-                <input type="text" id="prodTitle" class="w-full mt-1 p-2 border rounded-md text-sm" placeholder="e.g., Minimalist Desk Mat">
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" id="prodTitle" class="form-input" placeholder="e.g., Minimalist Desk Mat">
             </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase">Image URL</label>
-                <input type="text" id="prodImage" class="w-full mt-1 p-2 border rounded-md text-sm" placeholder="https://example.com/image.jpg">
+            <div class="form-group">
+                <label class="form-label">Image URL</label>
+                <input type="text" id="prodImage" class="form-input" placeholder="https://example.com/image.jpg">
             </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase">Amazon Affiliate URL</label>
-                <input type="text" id="prodLink" class="w-full mt-1 p-2 border rounded-md text-sm" placeholder="https://amzn.to/...">
+            <div class="form-group">
+                <label class="form-label">Amazon Affiliate URL</label>
+                <input type="text" id="prodLink" class="form-input" placeholder="https://amzn.to/...">
             </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase">Price Tag</label>
-                <input type="text" id="prodPrice" class="w-full mt-1 p-2 border rounded-md text-sm" placeholder="e.g., $25">
+            <div class="form-group">
+                <label class="form-label">Price Tag</label>
+                <input type="text" id="prodPrice" class="form-input" placeholder="e.g., $25">
             </div>
-            <button onclick="addProduct()" class="w-full bg-black text-white py-2 rounded-md font-medium text-sm hover:bg-gray-800 transition">Add Product Global</button>
-            
-            <hr class="my-6 border-gray-200">
-            <h3 class="text-sm font-bold text-gray-700 mb-3">Manage Live Products</h3>
-            <div id="adminProductList" class="space-y-2"></div>
+            <button class="btn-gold" onclick="addProduct()">Add Product</button>
+
+            <hr class="panel-divider">
+
+            <div class="manage-title">Live Products</div>
+            <div id="adminProductList"></div>
         </div>
     </div>
-
-    <footer class="text-center py-8 text-xs text-gray-400 max-w-2xl mx-auto px-4">
-        As an Amazon Associate, I earn from qualifying purchases.
-    </footer>
 
     <script>
         const SUPABASE_URL = "https://bddvpmtzuedxclseyxqs.supabase.co";
@@ -86,7 +579,6 @@
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let products = [];
 
-        // Check auth state on startup to keep user logged in if they refresh
         window.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await _supabase.auth.getSession();
             updateUIForAuth(session);
@@ -101,44 +593,62 @@
         function renderShop() {
             const grid = document.getElementById('productGrid');
             const adminList = document.getElementById('adminProductList');
-            
+
             if (!products || products.length === 0) {
-                grid.innerHTML = `<p class="text-center col-span-full text-gray-400 py-12 text-sm">Shop is empty.</p>`;
+                grid.innerHTML = `<div class="empty-state">No products yet — add some from the Admin panel.</div>`;
+                if (adminList) adminList.innerHTML = '';
                 return;
             }
 
-            grid.innerHTML = products.map(p => `
-                <div class="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-xs flex flex-col">
-                    <img src="${p.image}" class="w-full aspect-square object-cover">
-                    <div class="p-4 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-800 line-clamp-2">${p.title}</h3>
-                            <p class="text-xs font-bold text-gray-500 mt-1">${p.price || ''}</p>
-                        </div>
-                        <a href="${p.link}" target="_blank" class="mt-4 block text-center bg-gray-900 text-white text-xs py-2 rounded-md">View on Amazon</a>
-                    </div>
-                </div>
-            `).join('');
+            grid.innerHTML = products.map((p, i) => {
+                const imgTag = p.image
+                    ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.title)}" loading="lazy" onerror="this.parentElement.innerHTML=placeholderSVG()">`
+                    : `<div class="img-placeholder">${placeholderSVG()}<span>No image</span></div>`;
 
-            adminList.innerHTML = products.map(p => `
-                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md text-xs">
-                    <span class="truncate w-48">${p.title}</span>
-                    <button onclick="deleteProduct(${p.id})" class="text-red-500 font-bold">Delete</button>
-                </div>
-            `).join('');
+                return `
+                <div class="product-card" style="animation-delay:${i * 0.06}s">
+                    <div class="card-img-wrap">
+                        ${imgTag}
+                        ${p.price ? `<span class="card-tag">${escapeHtml(p.price)}</span>` : ''}
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <div class="card-title">${escapeHtml(p.title)}</div>
+                        </div>
+                    </div>
+                    <a href="${escapeHtml(p.link)}" target="_blank" rel="noopener" class="card-cta">
+                        <span>View on Amazon</span>
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                </div>`;
+            }).join('');
+
+            if (adminList) {
+                adminList.innerHTML = products.map(p => `
+                    <div class="admin-product-item">
+                        ${p.image ? `<img src="${escapeHtml(p.image)}" class="admin-prod-img" onerror="this.style.display='none'">` : `<div class="admin-prod-img"></div>`}
+                        <span class="admin-prod-name">${escapeHtml(p.title)}</span>
+                        <button class="delete-btn" onclick="deleteProduct(${p.id})">Del</button>
+                    </div>
+                `).join('');
+            }
         }
 
-        // Auth Logic Handlers
+        function placeholderSVG() {
+            return `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8A847C" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>No image</span>`;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
         async function handleLogin() {
             const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
-
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (error) {
-                alert('Login Failed: ' + error.message);
-            } else {
-                updateUIForAuth(data.session);
-            }
+            if (error) { alert('Login failed: ' + error.message); }
+            else { updateUIForAuth(data.session); }
         }
 
         async function handleLogout() {
@@ -147,36 +657,36 @@
         }
 
         function updateUIForAuth(session) {
-            const loginForm = document.getElementById('loginForm');
-            const adminControls = document.getElementById('adminControls');
-            if (session) {
-                loginForm.classList.add('hidden');
-                adminControls.classList.remove('hidden');
-            } else {
-                loginForm.classList.remove('hidden');
-                adminControls.classList.add('hidden');
-            }
+            document.getElementById('loginForm').classList.toggle('hidden', !!session);
+            document.getElementById('adminControls').classList.toggle('hidden', !session);
         }
 
         async function addProduct() {
-            const title = document.getElementById('prodTitle').value;
-            const image = document.getElementById('prodImage').value;
-            const link = document.getElementById('prodLink').value;
-            const price = document.getElementById('prodPrice').value;
-
+            const title = document.getElementById('prodTitle').value.trim();
+            const image = document.getElementById('prodImage').value.trim();
+            const link  = document.getElementById('prodLink').value.trim();
+            const price = document.getElementById('prodPrice').value.trim();
+            if (!title || !link) { alert('Name and link are required.'); return; }
             const { error } = await _supabase.from('products').insert([{ title, image, link, price }]);
-            if (error) alert(error.message);
-            else { fetchProducts(); }
+            if (error) { alert(error.message); }
+            else {
+                ['prodTitle','prodImage','prodLink','prodPrice'].forEach(id => document.getElementById(id).value = '');
+                fetchProducts();
+            }
         }
 
         async function deleteProduct(id) {
+            if (!confirm('Remove this product?')) return;
             const { error } = await _supabase.from('products').delete().eq('id', id);
-            if (error) alert(error.message);
+            if (error) { alert(error.message); }
             else fetchProducts();
         }
 
         function toggleAdminPanel() {
-            document.getElementById('adminPanel').classList.toggle('translate-x-full');
+            const panel = document.getElementById('adminPanel');
+            const overlay = document.getElementById('adminOverlay');
+            panel.classList.toggle('open');
+            overlay.classList.toggle('visible');
         }
     </script>
 </body>
