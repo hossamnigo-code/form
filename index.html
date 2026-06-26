@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='55' r='34' fill='%23f59e0b'/><path d='M50 22c8-12 24-12 28-6-4 10-18 14-28 6z' fill='%2316a34a'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><defs><linearGradient id='g' x1='.2' y1='.05' x2='.65' y2='1'><stop offset='0' stop-color='%23f6ae1f'/><stop offset='.5' stop-color='%23ee8a1d'/><stop offset='1' stop-color='%233f9b34'/></linearGradient></defs><path d='M86,90 A40 40 0 1 1 84,28 Q96,40 78,46' fill='none' stroke='url(%23g)' stroke-width='15' stroke-linecap='round'/><path d='M60,80 C44,78 33,62 40,44 C54,50 63,62 60,80 Z' fill='%233f9b34'/><path d='M60,80 C76,78 87,62 80,44 C66,50 57,62 60,80 Z' fill='%23f0a01e'/></svg>">
 <style>
 :root{
   --green-900:#0c2e1d;
@@ -115,7 +115,10 @@ html[dir="rtl"] .eyebrow{letter-spacing:0}
 .header .container{display:flex;align-items:center;justify-content:space-between;height:74px;gap:18px}
 .brand{display:flex;align-items:center;gap:12px;font-family:var(--ff-display);font-weight:700;font-size:23px;color:var(--green-800);letter-spacing:-.01em}
 .brand .logo{width:42px;height:42px;flex:none}
-.brand small{display:block;font-family:var(--ff-body);font-weight:600;font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--citrus);margin-top:2px}
+.brand .wm{font-family:var(--ff-body);font-weight:800;font-size:24px;letter-spacing:-.02em;line-height:1}
+.brand .wm .g{color:#3f9b34}.brand .wm .o{color:#e8941c}
+.brand small{display:block;font-family:var(--ff-body);font-weight:600;font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--citrus);margin-top:3px}
+.footer .wm .g,.mobile-menu .wm .g{color:#7cc24f}.footer .wm,.mobile-menu .wm{font-size:22px}
 html[dir="rtl"] .brand small{letter-spacing:.05em}
 .nav{display:flex;align-items:center;gap:4px}
 .nav a{
@@ -444,9 +447,9 @@ html[dir="rtl"] .totop{right:auto;left:26px}
 <!-- ============ HEADER ============ -->
 <header class="header" id="header">
   <div class="container">
-    <a href="#home" class="brand">
-      <svg class="logo" viewBox="0 0 100 100"><circle cx="50" cy="56" r="33" fill="#f59e0b"/><circle cx="50" cy="56" r="33" fill="url(#lg)" opacity=".25"/><path d="M50 24c9-13 26-13 30-6-5 11-20 15-30 6z" fill="#16a34a"/><defs><radialGradient id="lg" cx="35%" cy="30%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f59e0b"/></radialGradient></defs></svg>
-      <span>Agroland<small data-i18n="brand.tag">El-Naggar Group</small></span>
+    <a href="#home" class="brand" aria-label="Agroland — El-Naggar Group">
+      <svg class="logo" viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="agH" x1=".2" y1=".05" x2=".65" y2="1"><stop offset="0" stop-color="#f6ae1f"/><stop offset=".45" stop-color="#ee8a1d"/><stop offset="1" stop-color="#3f9b34"/></linearGradient></defs><path d="M86,90 A40 40 0 1 1 84,28 Q96,40 78,46" fill="none" stroke="url(#agH)" stroke-width="15" stroke-linecap="round"/><path d="M60,80 C44,78 33,62 40,44 C54,50 63,62 60,80 Z" fill="#3f9b34"/><path d="M60,80 C76,78 87,62 80,44 C66,50 57,62 60,80 Z" fill="#f0a01e"/></svg>
+      <span><span class="wm"><span class="g">agro</span><span class="o">land</span></span><small data-i18n="brand.tag">El-Naggar Group</small></span>
     </a>
     <nav class="nav">
       <a href="#about" data-i18n="nav.about">About</a>
@@ -467,7 +470,7 @@ html[dir="rtl"] .totop{right:auto;left:26px}
 <div class="scrim" id="scrim"></div>
 <aside class="mobile-menu" id="mobileMenu">
   <div class="mm-head">
-    <span class="brand" style="color:#fff;font-size:20px">Agroland</span>
+    <span class="brand"><svg class="logo" viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="agM" x1=".2" y1=".05" x2=".65" y2="1"><stop offset="0" stop-color="#f6ae1f"/><stop offset=".45" stop-color="#ee8a1d"/><stop offset="1" stop-color="#5cc14a"/></linearGradient></defs><path d="M86,90 A40 40 0 1 1 84,28 Q96,40 78,46" fill="none" stroke="url(#agM)" stroke-width="15" stroke-linecap="round"/><path d="M60,80 C44,78 33,62 40,44 C54,50 63,62 60,80 Z" fill="#5cc14a"/><path d="M60,80 C76,78 87,62 80,44 C66,50 57,62 60,80 Z" fill="#f0a01e"/></svg><span class="wm"><span class="g">agro</span><span class="o">land</span></span></span>
     <button class="mm-close" id="mmClose" aria-label="Close">&times;</button>
   </div>
   <a href="#about" data-i18n="nav.about">About</a>
@@ -862,8 +865,8 @@ html[dir="rtl"] .totop{right:auto;left:26px}
     <div class="footer-top">
       <div>
         <div class="brand">
-          <svg class="logo" viewBox="0 0 100 100" width="40" height="40"><circle cx="50" cy="56" r="33" fill="#f59e0b"/><path d="M50 24c9-13 26-13 30-6-5 11-20 15-30 6z" fill="#16a34a"/></svg>
-          <span style="color:#fff">Agroland</span>
+          <svg class="logo" viewBox="0 0 120 120" width="42" height="42" aria-hidden="true"><defs><linearGradient id="agF" x1=".2" y1=".05" x2=".65" y2="1"><stop offset="0" stop-color="#f6ae1f"/><stop offset=".45" stop-color="#ee8a1d"/><stop offset="1" stop-color="#5cc14a"/></linearGradient></defs><path d="M86,90 A40 40 0 1 1 84,28 Q96,40 78,46" fill="none" stroke="url(#agF)" stroke-width="15" stroke-linecap="round"/><path d="M60,80 C44,78 33,62 40,44 C54,50 63,62 60,80 Z" fill="#5cc14a"/><path d="M60,80 C76,78 87,62 80,44 C66,50 57,62 60,80 Z" fill="#f0a01e"/></svg>
+          <span class="wm"><span class="g">agro</span><span class="o">land</span></span>
         </div>
         <p class="footer-about" data-i18n="footer.about">Part of El-Naggar Group. Cultivating, packing and exporting premium Egyptian oranges, lemons, potatoes and onions to the world since 1991.</p>
         <div class="social">
